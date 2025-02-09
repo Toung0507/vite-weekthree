@@ -24,10 +24,8 @@ const defaultModalState = {
 function App() {
     const [isAuth, setIsAuth] = useState(false);
     const [account, setAccount] = useState({
-        "username": "spexial110@gmail.com",
-        // "username": "user@exapmle.com",
-        "password": "Spexial21001"
-        // "password": "example"
+        "username": "user@exapmle.com",
+        "password": "example"
     });
 
     const [resErrMessage, setResErrMessage] = useState("");
@@ -140,6 +138,7 @@ function App() {
                     is_enabled: tempProduct.is_enabled ? 1 : 0
                 }
             });
+            return res;
         }
         catch (error) {
             Swal.fire({
@@ -153,7 +152,7 @@ function App() {
     // 更新產品
     const updateProduct = async () => {
         try {
-            await axios.put(`${baseApi}/v2/api/${apiPath}/admin/product/${tempProduct.id}`, {
+            const res = await axios.put(`${baseApi}/v2/api/${apiPath}/admin/product/${tempProduct.id}`, {
                 data: {
                     ...tempProduct,
                     origin_price: Number(tempProduct.origin_price),
@@ -161,6 +160,7 @@ function App() {
                     is_enabled: tempProduct.is_enabled ? 1 : 0
                 }
             });
+            return res;
         }
         catch (error) {
             Swal.fire({
@@ -168,6 +168,7 @@ function App() {
                 text: `${error.response.data.message}`,
                 icon: "error"
             });
+            throw error;
         }
     };
 
@@ -186,12 +187,12 @@ function App() {
         const apiCall = ModalMode === 'create' ? addProduct : updateProduct;
         try {
             const res = await apiCall();
-            if (res.data.success) {
+            if (res && res.data.success) {
                 getProducts();
                 handleHideProductModal();
             }
         } catch (error) {
-            console.error(error);
+            // console.error(error);
         }
     };
 
@@ -277,9 +278,6 @@ function App() {
                                     </tr>
                                 </thead>
                                 <tbody>
-
-
-
                                     {products.map((item) => (
                                         <tr key={item.id}>
                                             <td>{item.title}</td>
@@ -371,7 +369,7 @@ function App() {
                                             />
                                         </div>
                                         <img
-                                            src={tempProduct.imageUrl}
+                                            src={tempProduct.imageUrl ? tempProduct.imageUrl : null}
                                             alt={tempProduct.title}
                                             className="img-fluid"
                                         />
